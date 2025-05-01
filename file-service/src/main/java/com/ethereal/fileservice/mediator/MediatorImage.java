@@ -32,6 +32,8 @@ public class MediatorImage {
             List<String> allowedExtensions = Arrays.asList("png", "jpg", "jpeg", "webp", "svg", "bmp");
             String fileExtension = Objects.requireNonNull(file.getOriginalFilename())
                     .substring(file.getOriginalFilename().lastIndexOf(".") + 1).toLowerCase();
+            System.out.println(fileExtension);
+            System.out.println("contains: " + allowedExtensions.contains(fileExtension));
             if (allowedExtensions.contains(fileExtension)) {
                 ImageEntity imageEntity = ftpService.uploadFileToFtp(file);
                 imageEntity = imageService.save(imageEntity);

@@ -1,5 +1,7 @@
 package com.ethereal.auth.facade;
 
+import com.ethereal.auth.dto.CheckEmailRequest;
+import com.ethereal.auth.dto.CheckEmailResponse;
 import com.ethereal.auth.entity.*;
 import com.ethereal.auth.exceptions.UserDoesntExistException;
 import com.ethereal.auth.exceptions.UserLockedException;
@@ -58,5 +60,10 @@ public class UserController {
     public ResponseEntity<List<SimpleProductDTO>> getFavouriteProducts(HttpServletRequest request) {
         List<SimpleProductDTO> favourites = userService.getFavouriteProducts(request);
         return ResponseEntity.ok(favourites);
+    }
+
+    @PostMapping("/check-email")
+    public CheckEmailResponse checkEmail(@RequestBody CheckEmailRequest request) {
+        return userService.checkEmailExistsAndEnabled(request.getEmail());
     }
 }

@@ -63,7 +63,8 @@ public class ProductService {
         CriteriaQuery<ProductEntity> query = criteriaBuilder.createQuery(ProductEntity.class);
         Root<ProductEntity> root = query.from(ProductEntity.class);
 
-        if (data != null && !data.isEmpty() && name != null && !name.trim().isEmpty()) {
+        if (data != null && !data.isBlank() && !"undefined".equalsIgnoreCase(data)
+                && name != null && !name.trim().isEmpty()) {
             DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
             LocalDate date = LocalDate.parse(data, inputFormatter);
             return productRepository.findByNameAndCreateAt(name, date);

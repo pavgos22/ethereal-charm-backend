@@ -10,6 +10,7 @@ import com.ethereal.productservice.translator.ProductFormToProductEntity;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.slf4j.Logger;
@@ -33,26 +34,44 @@ public class ProductMediator {
     private String FILE_SERVICE;
 
     public ResponseEntity<?> getProduct(int page, int limit, String name, String category, Float price_min, Float price_max, String data, String sort, String order) {
-        if (name != null && !name.isEmpty())
+
+        if (name != null && !name.isBlank())
             name = URLDecoder.decode(name, StandardCharsets.UTF_8);
 
-        List<ProductEntity> product = productService.getProduct(name, category, price_min, price_max, data, page, limit, sort, order);
+        if ("undefined".equalsIgnoreCase(data) || (data != null && data.isBlank()))
+            data = null;
 
-        product.forEach(value -> {
-            for (int i = 0; i < value.getImageUrls().length; i++)
-                value.getImageUrls()[i] = FILE_SERVICE + "?uuid=" + value.getImageUrls()[i];
+        List<ProductEntity> products = productService.getProduct(
+                name, category, price_min, price_max, data, page, limit, sort, order);
+
+        products.forEach(p -> {
+            for (int i = 0; i < p.getImageUrls().length; i++) {
+                p.getImageUrls()[i] = FILE_SERVICE + "?uuid=" + p.getImageUrls()[i];
+            }
         });
 
-        if (name == null || name.isEmpty() || data == null || data.isEmpty()) {
-            List<SimpleProductDTO> simpleProductDTOS = new ArrayList<>();
-            long totalCount = productService.countActiveProducts(name, category, price_min, price_max);
-            product.forEach(value -> {
-                simpleProductDTOS.add(productEntityToSimpleProduct.toSimpleProduct(value));
-            });
-            return ResponseEntity.ok().header("X-Total-Count", String.valueOf(totalCount)).body(simpleProductDTOS);
+        if (name == null || name.isBlank() || data == null) {
+            long totalCount = productService.countActiveProducts(
+                    name, category, price_min, price_max);
+
+            List<SimpleProductDTO> dtoList = products.stream()
+                    .map(productEntityToSimpleProduct::toSimpleProduct)
+                    .toList();
+
+            return ResponseEntity.ok()
+                    .header("X-Total-Count", String.valueOf(totalCount))
+                    .body(dtoList);
         }
-        ProductDTO productDTO = productEntityToProductDTO.toProductDTO(product.get(0));
-        return ResponseEntity.ok().body(productDTO);
+
+        if (products.isEmpty()) {
+            logger.info("Product not found: name='{}', date='{}'", name, data);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new Response("Product not found"));
+        }
+
+        ProductDTO productDTO = productEntityToProductDTO.toProductDTO(products.get(0));
+
+        return ResponseEntity.ok(productDTO);
     }
 
     public ResponseEntity<Response> saveProduct(ProductFormDTO productFormDTO) {

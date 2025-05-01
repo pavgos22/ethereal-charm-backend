@@ -1,5 +1,6 @@
 package com.ethereal.auth.services;
 
+import com.ethereal.auth.dto.CheckEmailResponse;
 import com.ethereal.auth.entity.*;
 import com.ethereal.auth.exceptions.*;
 import com.ethereal.auth.repository.ResetOperationsRepository;
@@ -398,6 +399,21 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    public CheckEmailResponse checkEmailExistsAndEnabled(String email) {
+        var userOptional = userRepository.findUserByEmail(email);
+
+        CheckEmailResponse response = new CheckEmailResponse();
+
+        if (userOptional.isPresent()) {
+            response.setExists(true);
+            response.setEnabled(userOptional.get().isEnabled());
+        } else {
+            response.setExists(false);
+            response.setEnabled(false);
+        }
+
+        return response;
+    }
 
     private String getTokenFromRequest(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();

@@ -41,7 +41,7 @@ public class User implements UserDetails {
     private String city;
     @Column(name = "street")
     private String street;
-    @Column(name = "number")
+    @Column(name = "apartment")
     private String apartmentNumber;
     @Column(name = "postalcode")
     private String postalCode;

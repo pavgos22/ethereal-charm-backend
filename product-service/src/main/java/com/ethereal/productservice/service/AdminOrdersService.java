@@ -69,7 +69,7 @@ public class AdminOrdersService {
                            u.role AS role, u.islock AS isLock, u.isenabled AS isEnabled, 
                            u.firstname AS firstName, u.lastname AS lastName, 
                            u.phone AS phone, u.city AS city, u.street AS street, 
-                           u.number AS apartmentNumber, u.postalcode AS postalCode, 
+                           u.apartment AS apartmentNumber, u.postalcode AS postalCode, 
                            u.iscompany AS isCompany, u.companyname AS companyName, 
                            u.nip AS nip
                     FROM users u
@@ -103,7 +103,7 @@ public class AdminOrdersService {
                                     u.role AS role, u.islock AS isLock, u.isenabled AS isEnabled,\s
                                     u.firstname AS firstName, u.lastname AS lastName,\s
                                     u.phone AS phone, u.city AS city, u.street AS street,\s
-                                    u.number AS apartmentNumber, u.postalcode AS postalCode,\s
+                                    u.apartment AS apartmentNumber, u.postalcode AS postalCode,\s
                                     u.iscompany AS isCompany, u.companyname AS companyName,\s
                                     u.nip AS nip
                              FROM users u

@@ -67,6 +67,9 @@ public class FtpService {
 
     private boolean streamFile(MultipartFile file, FTPClient ftpClient, String remoteFilePath) throws IOException {
         InputStream inputStream = file.getInputStream();
+        System.out.println("Trying to upload to: " + remoteFilePath);
+        System.out.println("FTP Client reply: " + ftpClient.getReplyString());
+        //ftpClient.addProtocolCommandListener(new PrintCommandListener(new PrintWriter(System.out)));
         boolean uploaded = ftpClient.storeFile(remoteFilePath, inputStream);
         inputStream.close();
         return uploaded;

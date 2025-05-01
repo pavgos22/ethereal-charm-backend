@@ -50,5 +50,4 @@ public class ResetOperationService {
             resetOperationsRepository.deleteAll(resetOperations);
         }
     }
-
 }
