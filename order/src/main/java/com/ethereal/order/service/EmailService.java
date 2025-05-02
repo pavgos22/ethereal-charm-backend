@@ -7,10 +7,9 @@ import com.ethereal.order.entity.SimpleProductDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
@@ -25,9 +24,6 @@ public class EmailService {
     @Value("${front.url}")
     private String FRONTEND_URL;
 
-    @Value("classpath:static/mail-order.html")
-    private Resource orderTemplate;
-
     public SimpleProductDTO getProductDetails(String productUuid) {
         String url = "http://localhost:8888/api/v1/product/" + productUuid;
         try {
@@ -41,13 +37,15 @@ public class EmailService {
 
     private String generateOrderDetailsHtml(Order order, List<OrderItems> items) {
         StringBuilder htmlBuilder = new StringBuilder();
-        htmlBuilder.append("<html><body>");
-        htmlBuilder.append("<h1>Szczegóły Twojego zamówienia</h1>");
-        htmlBuilder.append("<p>Numer zamówienia: ").append(order.getOrders()).append("</p>");
+        htmlBuilder.append("<html><body style=\"background-color:#f8f5f5; font-family:Georgia, serif; text-align:center;\">");
+        htmlBuilder.append("<div style=\"max-width:600px; margin:0 auto; background:#ffffff; padding:30px; box-shadow:0 0 20px rgba(140, 100, 100, 0.1); text-align:center;\">");
+
+        htmlBuilder.append("<h1 style=\"color:#8c6464;\">Szczegóły Twojego zamówienia</h1>");
+        htmlBuilder.append("<p>Numer zamówienia: <strong>").append(order.getOrders()).append("</strong></p>");
         htmlBuilder.append("<p>Status zamówienia: <strong>").append(order.getStatus()).append("</strong></p>");
         htmlBuilder.append("<p>Kwota zamówienia: <strong>").append(calculateTotalPrice(items)).append(" zł</strong></p>");
 
-        htmlBuilder.append("<h2>Dane klienta:</h2>");
+        htmlBuilder.append("<h2 style=\"color:#8c6464;\">Dane klienta</h2>");
         htmlBuilder.append("<p>Imię: ").append(order.getFirstName()).append("</p>");
         htmlBuilder.append("<p>Nazwisko: ").append(order.getLastName()).append("</p>");
         if (order.isCompany()) {
@@ -57,26 +55,32 @@ public class EmailService {
             htmlBuilder.append("<p>Osoba prywatna</p>");
         }
 
-        htmlBuilder.append("<h2>Adres dostawy:</h2>");
-        htmlBuilder.append("<p>Miasto: ").append(order.getCity()).append("</p>");
-        htmlBuilder.append("<p>Ulica: ").append(order.getStreet()).append("</p>");
-        htmlBuilder.append("<p>Numer domu/mieszkania: ").append(order.getNumber()).append("</p>");
-        htmlBuilder.append("<p>Kod pocztowy: ").append(order.getPostCode()).append("</p>");
+        htmlBuilder.append("<h2 style=\"color:#8c6464;\">Adres dostawy</h2>");
+        htmlBuilder.append("<p>").append(order.getStreet()).append(" ").append(order.getNumber()).append("</p>");
+        htmlBuilder.append("<p>").append(order.getPostCode()).append(" ").append(order.getCity()).append("</p>");
 
-        htmlBuilder.append("<h2>Produkty w zamówieniu:</h2>");
-        htmlBuilder.append("<ul>");
+        htmlBuilder.append("<h2 style=\"color:#8c6464;\">Produkty</h2>");
+        htmlBuilder.append("<table style=\"margin: 0 auto; border-collapse: collapse; width: 100%;\">");
+        htmlBuilder.append("<thead><tr><th style='padding: 10px;'>Zdjęcie</th><th style='padding: 10px;'>Nazwa</th><th style='padding: 10px;'>Ilość</th><th style='padding: 10px;'>Cena</th></tr></thead>");
+        htmlBuilder.append("<tbody>");
+
         for (OrderItems item : items) {
             SimpleProductDTO productDetails = getProductDetails(item.getProduct());
             String imageUrl = "http://localhost:8088/api/v1/image?uuid=" + productDetails.getImageUrl();
 
-            htmlBuilder.append("<li>")
-                    .append("<img src='").append(imageUrl).append("' alt='Zdjęcie produktu' width='50' height='50' /> ")
-                    .append(productDetails.getName())
-                    .append(" - Ilość: ").append(item.getQuantity())
-                    .append(", Cena: ").append(item.getPriceSummary()).append(" zł</li>");
+            htmlBuilder.append("<tr>");
+            htmlBuilder.append("<td style='padding: 10px;'><img src='").append(imageUrl).append("' alt='Zdjęcie produktu' width='60' height='60' style='border-radius: 5px;'/></td>");
+            htmlBuilder.append("<td style='padding: 10px;'>").append(productDetails.getName()).append("</td>");
+            htmlBuilder.append("<td style='padding: 10px;'>").append(item.getQuantity()).append("</td>");
+            htmlBuilder.append("<td style='padding: 10px;'>").append(item.getPriceSummary()).append(" zł</td>");
+            htmlBuilder.append("</tr>");
         }
-        htmlBuilder.append("</ul>");
 
+        htmlBuilder.append("</tbody></table>");
+
+        htmlBuilder.append("<p style='margin-top: 30px; color:#aaa; font-size: 12px;'>Dziękujemy za zakupy w Ethereal Charm!</p>");
+
+        htmlBuilder.append("</div>");
         htmlBuilder.append("</body></html>");
         return htmlBuilder.toString();
     }
