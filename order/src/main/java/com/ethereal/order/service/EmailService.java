@@ -24,8 +24,15 @@ public class EmailService {
     @Value("${front.url}")
     private String FRONTEND_URL;
 
+    @Value("${product.service.url}")
+    private String PRODUCT_SERVICE;
+
+    @Value("${image.service.url}")
+    private String IMAGE_SERVICE;
+
+
     public SimpleProductDTO getProductDetails(String productUuid) {
-        String url = "http://localhost:8888/api/v1/product/" + productUuid;
+        String url = PRODUCT_SERVICE + "/" + productUuid;
         try {
             ResponseEntity<SimpleProductDTO> response = restTemplate.getForEntity(url, SimpleProductDTO.class);
             return response.getBody();
@@ -66,7 +73,7 @@ public class EmailService {
 
         for (OrderItems item : items) {
             SimpleProductDTO productDetails = getProductDetails(item.getProduct());
-            String imageUrl = "http://localhost:8088/api/v1/image?uuid=" + productDetails.getImageUrl();
+            String imageUrl = IMAGE_SERVICE + productDetails.getImageUrl();
 
             htmlBuilder.append("<tr>");
             htmlBuilder.append("<td style='padding: 10px;'><img src='").append(imageUrl).append("' alt='Zdjęcie produktu' width='60' height='60' style='border-radius: 5px;'/></td>");

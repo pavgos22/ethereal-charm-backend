@@ -25,7 +25,8 @@ public class AdminOrdersService {
 
     @Value("${file-service.url}")
     private String FILE_SERVICE;
-    private final String ORDER_SERVICE = "http://localhost:8881/api/v1/order";
+    @Value("${order-service.url}")
+    private String ORDER_SERVICE;
 
 
     public List<OrderDTO> getAllOrders() {

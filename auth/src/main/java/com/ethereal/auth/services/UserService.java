@@ -44,6 +44,8 @@ public class UserService {
     private int exp;
     @Value("${jwt.refresh.exp}")
     private int refreshExp;
+    @Value("${file-service.url}")
+    private String FILE_SERVICE;
 
 
     private User saveUser(User user) {
@@ -382,8 +384,6 @@ public class UserService {
                             WHERE p.uid = ANY(:productUids)
                         """).setParameter("productUids", user.getFavouriteProductUids().toArray(new String[0]))
                 .getResultList();
-
-        String FILE_SERVICE = "http://localhost:8088/api/v1/image?uuid=";
 
         return results.stream()
                 .map(result -> new SimpleProductDTO(
