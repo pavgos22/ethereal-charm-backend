@@ -35,7 +35,7 @@ docker run -d --name ftp -p 8001:21 -p 21011-21020:21011-21020 -e USERS="etherea
 
 ### Frontend available here:
 
-https://github.com/pavgos22/ecommerce-frontend
+https://github.com/pavgos22/ethereal-charm-frontend
 
 ---
 
