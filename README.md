@@ -30,3 +30,13 @@ To configure an FTP server for file management, use the following command:
 ```bash
 docker run -d --name ftp -p 8001:21 -p 21011-21020:21011-21020 -e USERS="ethereal|ethereal_pass|/home/ethereal|10000" delfer/alpine-ftp-server
 ```
+
+---
+
+### Frontend available here:
+
+https://github.com/pavgos22/ecommerce-frontend
+
+---
+
+The project is based on the [ecommerce-backend-api](https://github.com/pavgos22/ecommerce-backend-api) repository - a project I finished writing at the end of January 2025
