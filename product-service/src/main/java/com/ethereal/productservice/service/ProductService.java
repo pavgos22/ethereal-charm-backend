@@ -23,10 +23,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +35,10 @@ public class ProductService {
 
     @Value("${file-service.url}")
     private String FILE_SERVICE;
+
+    @Value("${public-image.url}")
+    private String PUBLIC_IMAGE_URL;
+
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
 
@@ -151,33 +152,38 @@ public class ProductService {
 
     @Transactional
     public void createProduct(ProductEntity product) {
-        logger.info("Creating product with details: {}", product);
-
         if (product != null) {
-            product.setCreateAt(LocalDate.now());
-            product.setUid(UUID.randomUUID().toString());
+            if (product.getUid() == null || product.getUid().isBlank()) {
+                product.setUid(UUID.randomUUID().toString());
+            }
+
+            if (product.getCreateAt() == null) {
+                product.setCreateAt(LocalDate.now());
+            }
+
             product.setActivate(true);
             productRepository.save(product);
 
-            for (String uuid : product.getImageUrls())
+            for (String uuid : product.getImageUrls()) {
                 activateImage(uuid);
-
-            logger.info("Product created successfully with UID: {}", product.getUid());
-            return;
+            }
+        } else {
+            throw new RuntimeException("Product is null, cannot create.");
         }
-        throw new RuntimeException("Product is null, cannot create.");
     }
 
+
+
     private void activateImage(String uuid) {
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(FILE_SERVICE + "?uuid=" + uuid))
+        HttpRequest req = HttpRequest.newBuilder()
+                .uri(URI.create(FILE_SERVICE + "/activate?uuid=" + uuid))
                 .method("PATCH", HttpRequest.BodyPublishers.noBody())
                 .build();
-        try {
-            HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (IOException | InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        HttpClient.newHttpClient().sendAsync(req, HttpResponse.BodyHandlers.discarding());
+    }
+
+    public String buildImageLink(String uuid) {
+        return PUBLIC_IMAGE_URL + "?uuid=" + uuid;
     }
 
     @Transactional

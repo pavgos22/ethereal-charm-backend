@@ -2,8 +2,6 @@ package com.ethereal.auth.services;
 
 import com.ethereal.auth.config.EmailConfiguration;
 import com.ethereal.auth.entity.User;
-import com.google.common.base.Charsets;
-import com.google.common.io.Files;
 import jakarta.annotation.PostConstruct;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
-
+import java.nio.charset.StandardCharsets;
 
 @Service
 @RequiredArgsConstructor
@@ -25,14 +23,15 @@ public class EmailService {
     private final EmailConfiguration emailConfiguration;
 
     @Value("${front.url}")
-    private String fontendUrl;
+    private String frontendUrl;
 
-    @Value("classpath:static/activation-mail.html")
-    private Resource activeTemplate;
-    @Value("classpath:static/password-reset.html")
+    @Value("classpath:/templates/activation-mail.html")
+    private Resource activationTemplate;
+
+    @Value("classpath:/templates/password-reset.html")
     private Resource recoveryTemplate;
 
-    @Value("classpath:static/img/logo.png")
+    @Value("classpath:/static/img/logo.png")
     private Resource logoResource;
 
     private byte[] logoBytes;
@@ -49,16 +48,13 @@ public class EmailService {
     public void sendActivation(User user) {
         log.info("--START sendActivation");
         try {
-            String html = Files.toString(activeTemplate.getFile(), Charsets.UTF_8)
+            String html = readTemplate(activationTemplate)
                     .replace("https://google.com",
-                            fontendUrl + "/activate/" + user.getUuid());
+                            frontendUrl + "/activate/" + user.getUuid());
 
             emailConfiguration.sendMailWithInlineImage(
-                    user.getEmail(),
-                    html,
-                    "Aktywacja konta",
-                    logoBytes
-            );
+                    user.getEmail(), html, "Aktywacja konta", logoBytes);
+
         } catch (IOException | MessagingException e) {
             log.error("Błąd wysyłania maila", e);
             throw new RuntimeException(e);
@@ -66,18 +62,26 @@ public class EmailService {
         log.info("--STOP sendActivation");
     }
 
-
-
     public void sendPasswordRecovery(User user, String uid) {
+        log.info("--START sendPasswordRecovery");
         try {
-            log.info("--START sendPasswordRecovery");
-            String html = Files.toString(recoveryTemplate.getFile(), Charsets.UTF_8);
-            html = html.replace("https://google.com", fontendUrl + "/password-recovery/" + uid);
-            emailConfiguration.sendMail(user.getEmail(), html, "Odzyskanie hasła", true);
+            String html = readTemplate(recoveryTemplate)
+                    .replace("https://google.com",
+                            frontendUrl + "/password-recovery/" + uid);
+
+            emailConfiguration.sendMail(
+                    user.getEmail(), html, "Odzyskanie hasła", true);
+
         } catch (IOException e) {
-            log.info("Cannot send mail");
+            log.error("Cannot send mail", e);
             throw new RuntimeException(e);
         }
         log.info("--STOP sendPasswordRecovery");
+    }
+
+    private static String readTemplate(Resource resource) throws IOException {
+        try (InputStream in = resource.getInputStream()) {
+            return new String(in.readAllBytes(), StandardCharsets.UTF_8);
+        }
     }
 }

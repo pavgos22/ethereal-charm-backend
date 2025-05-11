@@ -42,7 +42,7 @@ public class UserService {
     private final CookieService cookieService;
     @Value("${jwt.exp}")
     private int exp;
-    @Value("${jwt.refresh.exp}")
+    @Value("${jwt.refresh-exp}")
     private int refreshExp;
     @Value("${file-service.url}")
     private String FILE_SERVICE;

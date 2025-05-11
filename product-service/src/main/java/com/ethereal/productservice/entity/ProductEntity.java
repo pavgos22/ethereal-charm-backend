@@ -9,6 +9,7 @@ import org.hibernate.annotations.Type;
 
 import java.time.LocalDate;
 import java.util.Map;
+import java.util.UUID;
 
 @Entity
 @Table(name = "products")
@@ -47,7 +48,7 @@ public class ProductEntity extends Product {
     @Column(name = "discounted_price")
     private Float discountedPrice;
     @Column(name = "priority")
-    private int priority;
+    private Integer priority = 0;
 
     public ProductEntity(long id, String uid, boolean activate, String name, String mainDesc, String descHtml, float price, String[] imageUrls, Map<String, String> parameters, LocalDate createAt, Category category) {
         super(uid, activate, name, mainDesc, descHtml, price, imageUrls, parameters, createAt);

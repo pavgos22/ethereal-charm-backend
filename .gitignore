@@ -1,44 +1,70 @@
-# Created by .ignore support plugin
-#.gitignore for java
+# --- Java & Maven ---
 *.class
-
-# Package Files #
 *.jar
 *.war
 *.ear
 *.ids
-**/target/
-**/.mvn/
-# logs
-/stacktrace.log
-/test/reports
-/logs
 *.log
 *.log.*
-
-## .gitignore for intellij
-*.iml
-*.ipr
-*.iws
-.idea/
-
-## .gitignore for eclipse
-*.pydevproject
-.project
-.metadata
-bin/**
-tmp/**
-tmp/**/*
 *.tmp
 *.bak
 *.swp
 *~.nib
-local.properties
-.classpath
-.settings/
-.loadpath
-**/.DS_Store
-.DS_Store
+**/target/
+**/.mvn/
+hs_err_pid*
 
-## backup bazy
+# --- Spring Boot ---
+spring.log
+
+# --- IDEs ---
+*.iml
+*.ipr
+*.iws
+.idea/
+*.vs/
+*.vscode/
+*.launch
+*.settings/
+.classpath
+.project
+.loadpath
+.metadata
+
+# --- macOS / Windows ---
+.DS_Store
+Thumbs.db
+
+# --- Test reports & logs ---
+/logs
+/test/reports
+/stacktrace.log
+
+# --- Environment and config secrets ---
+.env
+.env.*
+*.yml.prod
+*.prod.yml
+application-*.yml
+*.yml
+**/settings.xml
+
+# --- Docker ---
+docker-compose.override.yml
+docker-compose*.override.yml
+*.dockerfile
+
+# --- Backup ---
 postgres_backup
+*.sql
+*.dump
+
+# --- CI/CD temporary ---
+build/
+out/
+node_modules/
+
+# --- Misc ---
+*.idea/
+*.classpath
+tmp/**

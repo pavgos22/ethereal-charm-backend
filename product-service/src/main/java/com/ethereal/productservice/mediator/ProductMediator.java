@@ -44,12 +44,6 @@ public class ProductMediator {
         List<ProductEntity> products = productService.getProduct(
                 name, category, price_min, price_max, data, page, limit, sort, order);
 
-        products.forEach(p -> {
-            for (int i = 0; i < p.getImageUrls().length; i++) {
-                p.getImageUrls()[i] = FILE_SERVICE + "?uuid=" + p.getImageUrls()[i];
-            }
-        });
-
         if (name == null || name.isBlank() || data == null) {
             long totalCount = productService.countActiveProducts(
                     name, category, price_min, price_max);

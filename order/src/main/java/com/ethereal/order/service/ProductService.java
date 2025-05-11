@@ -15,7 +15,7 @@ import java.net.URISyntaxException;
 @RequiredArgsConstructor
 public class ProductService {
     private final RestTemplate restTemplate;
-    @Value("${product.service}")
+    @Value("${product-service.url}")
     private String PRODUCT_URL;
 
     public ProductEntity getProduct(String uuid) {

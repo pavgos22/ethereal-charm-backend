@@ -24,10 +24,10 @@ public class EmailService {
     @Value("${front.url}")
     private String FRONTEND_URL;
 
-    @Value("${product.service.url}")
+    @Value("${product-service.url}")
     private String PRODUCT_SERVICE;
 
-    @Value("${image.service.url}")
+    @Value("${image-service.url}")
     private String IMAGE_SERVICE;
 
 

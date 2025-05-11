@@ -6,6 +6,8 @@ import com.ethereal.productservice.entity.ProductDTO;
 import com.ethereal.productservice.entity.ProductEntity;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
+
 @Component
 public class ProductEntityToProductDTO {
 
@@ -17,7 +19,7 @@ public class ProductEntityToProductDTO {
         productDTO.setMainDesc(productEntity.getMainDesc());
         productDTO.setDescHtml(productEntity.getDescHtml());
         productDTO.setPrice(productEntity.getPrice());
-        productDTO.setImageUrls(productEntity.getImageUrls());
+        productDTO.setImageUrls(Arrays.stream(productEntity.getImageUrls()).map(uuid -> "/api/v1/image?uuid=" + uuid).toArray(String[]::new));
         productDTO.setParameters(productEntity.getParameters());
         productDTO.setCreateAt(productEntity.getCreateAt());
         productDTO.setCategoryDTO(toCategoryDTO(productEntity.getCategory()));

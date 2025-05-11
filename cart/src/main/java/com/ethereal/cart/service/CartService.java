@@ -30,7 +30,7 @@ public class CartService {
     private final CartRepository cartRepository;
     private final RestTemplate restTemplate;
     private final CookieService cookieService;
-    @Value("${product.service.url}")
+    @Value("${product-service.url}")
     private String PRODUCT_URL;
 
 
@@ -139,6 +139,7 @@ public class CartService {
         HttpHeaders httpHeaders = new HttpHeaders();
         if (request.getCookies() != null)
             cookies.addAll(List.of(request.getCookies()));
+
         CartItemListDTO cartItemListDTO = new CartItemListDTO();
         cartItemListDTO.setCartProducts(new ArrayList<>());
 
@@ -152,16 +153,32 @@ public class CartService {
                     cartItemRepository.findCartItemsByCart(cart).forEach(item -> {
                         try {
                             Product product = getProduct(item.getProduct());
+                            if (product == null) return;
+
                             double unitPrice = item.getPriceUnit();
+
+                            String[] imageUrls = product.getImageUrls();
+                            String raw = (imageUrls != null && imageUrls.length > 0) ? imageUrls[0] : null;
+                            String uuid = null;
+
+                            if (raw != null) {
+                                int index = raw.indexOf("uuid=");
+                                uuid = (index != -1) ? raw.substring(index + 5) : raw;
+                            }
+
+                            String imageUrl = (uuid != null && !uuid.isBlank())
+                                    ? "/api/v1/image?uuid=" + uuid
+                                    : null;
 
                             cartItemListDTO.getCartProducts().add(new CartItemDTO(
                                     product.getUid(),
                                     product.getName(),
                                     item.getQuantity(),
-                                    product.getImageUrls()[0],
+                                    imageUrl,
                                     unitPrice,
                                     unitPrice * item.getQuantity()
                             ));
+
                             cartItemListDTO.setSummaryPrice(cartItemListDTO.getSummaryPrice() + (item.getQuantity() * unitPrice));
                         } catch (URISyntaxException e) {
                             throw new RuntimeException(e);
