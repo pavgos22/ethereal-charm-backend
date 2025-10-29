@@ -8,6 +8,7 @@ import lombok.Setter;
 import org.hibernate.annotations.Type;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.UUID;
 
@@ -48,7 +49,7 @@ public class ProductEntity extends Product {
     @Column(name = "discounted_price")
     private Float discountedPrice;
     @Column(name = "priority")
-    private Integer priority = 0;
+    private Integer priority = 50;
 
     public ProductEntity(long id, String uid, boolean activate, String name, String mainDesc, String descHtml, float price, String[] imageUrls, Map<String, String> parameters, LocalDate createAt, Category category) {
         super(uid, activate, name, mainDesc, descHtml, price, imageUrls, parameters, createAt);

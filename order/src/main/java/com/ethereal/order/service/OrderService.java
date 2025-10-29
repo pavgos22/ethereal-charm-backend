@@ -39,20 +39,29 @@ public class OrderService {
     }
 
     private Order save(Order order) {
-        Deliver deliver = deliverRepository.findByUuid(order.getDeliver().getUuid()).orElseThrow(UknowDeliverTypException::new);
-        StringBuilder stringBuilder = new StringBuilder("ORDER/")
-                .append(orderRepository.count() + 102137)
-                .append("/")
-                .append(LocalDate.now().getMonthValue())
-                .append("/")
-                .append(LocalDate.now().getYear());
+        Deliver deliver = deliverRepository.findByUuid(order.getDeliver().getUuid())
+                .orElseThrow(UknowDeliverTypException::new);
+
+        int randomPrefix = new Random().nextInt(900000) + 100000;
+        int countOffset = (int) orderRepository.count() + 2123;
+        String monthFormatted = String.format("%02d", LocalDate.now().getMonthValue());
+
+        String orderNumber = "ORDER/" +
+                randomPrefix +
+                "/" +
+                countOffset +
+                "/" +
+                monthFormatted +
+                "/" +
+                LocalDate.now().getYear();
 
         order.setUuid(UUID.randomUUID().toString());
         order.setStatus(Status.PENDING);
-        order.setOrders(stringBuilder.toString());
+        order.setOrders(orderNumber);
         order.setDeliver(deliver);
         return orderRepository.saveAndFlush(order);
     }
+
 
     @Transactional
     public String createOrder(Order order, HttpServletRequest request, HttpServletResponse response) {

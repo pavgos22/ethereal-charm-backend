@@ -15,6 +15,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -37,6 +38,9 @@ public class OrderMediator {
     private final OrderToOrderDTO orderToOrderDTO;
     private final ProductService productService;
     private final AuthService authService;
+
+    @Value("${image-service.url}")
+    private String IMAGE_URL;
 
     public ResponseEntity<?> getAllOrders() {
         List<Order> orders = orderService.getAllOrders();
@@ -130,7 +134,19 @@ public class OrderMediator {
             Items items = orderItemsToItems.toItems(value);
             items.setPrice(unitPrice);
             items.setSummaryPrice(unitPrice * value.getQuantity());
-            items.setImageUrl(productService.getProduct(value.getProduct()).getImageUrls()[0]);
+            ProductEntity product = productService.getProduct(value.getProduct());
+            System.out.println("Product UID: " + value.getProduct());
+            System.out.println("Fetched Product: " + product);
+            System.out.println("Product imageUrls: " + (product != null ? Arrays.toString(product.getImageUrls()) : "null"));
+            System.out.println(product.getImageUrls()[0] != null ? "Final imageUrl: " + IMAGE_URL + "/api/v1/image?uuid=" + product.getImageUrls()[0] : "product.getImageUrls()[0] is null"); ;
+            String imageUrl = null;
+            if (product != null) {
+                String[] images = product.getImageUrls();
+                if (images != null && images.length > 0 && images[0] != null && !images[0].isBlank()) {
+                    imageUrl = "https://ethereal-charm.pl" + images[0];
+                }
+            }
+            items.setImageUrl(imageUrl);
             itemsDTO.add(items);
             summary.set(summary.get() + items.getSummaryPrice());
         });

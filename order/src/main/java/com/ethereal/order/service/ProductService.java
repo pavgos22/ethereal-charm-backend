@@ -19,16 +19,17 @@ public class ProductService {
     private String PRODUCT_URL;
 
     public ProductEntity getProduct(String uuid) {
-        URI uri = null;
         try {
-            uri = new URIBuilder(PRODUCT_URL).addParameter("uuid", uuid).build();
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
-        ResponseEntity<?> response = restTemplate.getForEntity(uri, ProductEntity.class);
-        if (response.getStatusCode().isError()) {
+            URI uri = new URIBuilder(PRODUCT_URL).addParameter("uuid", uuid).build();
+            ResponseEntity<ProductEntity[]> response = restTemplate.getForEntity(uri, ProductEntity[].class);
+
+            if (response.getStatusCode().is2xxSuccessful()) {
+                ProductEntity[] products = response.getBody();
+                return (products != null && products.length > 0) ? products[0] : null;
+            }
             return null;
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("Invalid URI for product service", e);
         }
-        return (ProductEntity) response.getBody();
     }
 }

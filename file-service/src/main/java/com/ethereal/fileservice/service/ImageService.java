@@ -27,7 +27,7 @@ public class ImageService {
 
     @Scheduled(cron = "0 0 1 * * ?")
     public void cleanImages() {
-        imageRepository.findDontUseImages().forEach(value -> {
+        imageRepository.findNotUsedImages().forEach(value -> {
             try {
                 ftpService.deleteFile(value.getPath());
                 imageRepository.delete(value);

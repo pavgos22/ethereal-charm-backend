@@ -27,6 +27,8 @@ public class AdminOrdersService {
     private String FILE_SERVICE;
     @Value("${order-service.url}")
     private String ORDER_SERVICE;
+    @Value("${public-image.url}")
+    private String PUBLIC_IMAGE_URL;
 
 
     public List<OrderDTO> getAllOrders() {
@@ -171,12 +173,13 @@ public class AdminOrdersService {
                     ProductEntity product = productRepository.findByUid(orderItem.getProductUuid())
                             .orElseThrow(() -> new RuntimeException("Product not found: " + orderItem.getProductUuid()));
 
+                    System.out.println("SimpleProductDTO imageUrl: " + product.getImageUrls()[0]);
                     return new SimpleProductDTO(
                             product.getUid(),
                             product.getName(),
                             product.getMainDesc(),
                             product.getPrice(),
-                            FILE_SERVICE + "?uuid=" + product.getImageUrls()[0],
+                            product.getImageUrls()[0],
                             product.getCreateAt(),
                             product.isDiscount(),
                             product.getDiscountedPrice(),
@@ -214,8 +217,7 @@ public class AdminOrdersService {
                 .map(item -> {
                     String productUuid = (String) item[2];
                     ProductEntity product = productRepository.findByUid(productUuid).orElseThrow(() -> new RuntimeException("Product not found: " + productUuid));
-                    String imageUrl = FILE_SERVICE + "?uuid=" + product.getImageUrls()[0];
-
+                    String imageUrl = PUBLIC_IMAGE_URL + "?uuid=" + product.getImageUrls()[0];
                     return new OrderProductDTO(
                             (String) item[1],
                             ((Number) item[5]).longValue(),
