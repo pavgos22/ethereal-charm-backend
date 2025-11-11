@@ -38,6 +38,7 @@ public class UserService {
     private final ResetOperationsRepository resetOperationsRepository;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final TwoFaService twoFaService;
     private final EmailService emailService;
     private final CookieService cookieService;
     @Value("${jwt.exp}")
@@ -168,40 +169,40 @@ public class UserService {
     public ResponseEntity<?> login(HttpServletResponse response, User authRequest) {
         log.info("--START LoginService");
 
-        log.info("Authenticating user: " + authRequest.getUsername());
-
         User user = userRepository.findUserByLoginOrEmailAndLockAndEnabled(authRequest.getUsername()).orElse(null);
-        // log.info("User found: " + user);
-
-        if (user != null) {
-            Authentication authenticate = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
-            );
-
-            log.info("Authentication result: " + authenticate.isAuthenticated());
-
-            if (authenticate.isAuthenticated()) {
-                Cookie refresh = cookieService.generateCookie("refresh", generateToken(authRequest.getUsername(), refreshExp), refreshExp);
-                Cookie cookie = cookieService.generateCookie("Authorization", generateToken(authRequest.getUsername(), exp), exp);
-                response.addCookie(cookie);
-                response.addCookie(refresh);
-
-                log.info("--STOP LoginService");
-                return ResponseEntity.ok(
-                        UserRegisterDTO.builder()
-                                .login(user.getUsername())
-                                .email(user.getEmail())
-                                .role(user.getRole())
-                                .build()
-                );
-            } else {
-                log.info("--STOP LoginService: Authentication failed");
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthResponse(Code.A1));
-            }
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthResponse(Code.A2));
         }
 
-        log.info("--STOP LoginService: User doesn't exist");
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthResponse(Code.A2));
+        Authentication authenticate = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
+        );
+        if (!authenticate.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthResponse(Code.A1));
+        }
+
+        if (user.isTwoFactorEnabled()) {
+            var challengeId = twoFaService.createLoginChallenge(user);
+            return ResponseEntity.ok().body(
+                    java.util.Map.of(
+                            "twoFactorRequired", true,
+                            "challengeId", challengeId.toString()
+                    )
+            );
+        }
+
+        Cookie refresh = cookieService.generateCookie("refresh", generateToken(authRequest.getUsername(), refreshExp), refreshExp);
+        Cookie cookie  = cookieService.generateCookie("Authorization", generateToken(authRequest.getUsername(), exp), exp);
+        response.addCookie(cookie);
+        response.addCookie(refresh);
+
+        return ResponseEntity.ok(
+                UserRegisterDTO.builder()
+                        .login(user.getUsername())
+                        .email(user.getEmail())
+                        .role(user.getRole())
+                        .build()
+        );
     }
 
 

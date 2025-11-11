@@ -4,6 +4,7 @@ import com.ethereal.auth.entity.*;
 import com.ethereal.auth.exceptions.UserDoesntExistException;
 import com.ethereal.auth.exceptions.UserExistingWithMail;
 import com.ethereal.auth.exceptions.UserExistingWithName;
+import com.ethereal.auth.services.TwoFaMediator;
 import com.ethereal.auth.services.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final UserService userService;
+    private final TwoFaMediator twoFaMediator;
 
     @RequestMapping(path = "/register", method = RequestMethod.POST)
     public ResponseEntity<AuthResponse> addNewUser(@Valid @RequestBody UserRegisterDTO user) {
@@ -144,6 +146,36 @@ public class AuthController {
         } catch (UserDoesntExistException e) {
             log.info("User doesn't exist in database");
             return ResponseEntity.status(400).body(new AuthResponse(Code.A6));
+        }
+    }
+
+    @RequestMapping(path = "/2fa/verify", method = RequestMethod.POST)
+    public ResponseEntity<?> verify2fa(@RequestParam("challengeId") String challengeId, @RequestParam("code") String code, HttpServletResponse response) {
+        log.info("--START 2FA VERIFY");
+        try {
+            var dto = twoFaMediator.verifyAndIssueTokens(challengeId, code, response);
+            log.info("--STOP 2FA VERIFY");
+            return ResponseEntity.ok(dto);
+        } catch (IllegalArgumentException e) {
+            log.info("2FA invalid code/challenge");
+            return ResponseEntity.status(401).body(new AuthResponse(Code.A3));
+        } catch (IllegalStateException e) {
+            log.info("2FA expired/too many attempts");
+            return ResponseEntity.status(410).body(new AuthResponse(Code.A3));
+        }
+    }
+
+    @RequestMapping(path = "/settings/2fa", method = RequestMethod.PATCH)
+    public ResponseEntity<AuthResponse> toggle2fa(HttpServletRequest request, @RequestParam("enabled") boolean enabled) {
+        log.info("--START 2FA TOGGLE: {}", enabled);
+        try {
+            twoFaMediator.toggleTwoFactor(request, enabled);
+            log.info("--STOP 2FA TOGGLE");
+            return ResponseEntity.ok(new AuthResponse(Code.SUCCESS));
+        } catch (UserDoesntExistException e) {
+            return ResponseEntity.status(401).body(new AuthResponse(Code.A1));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(400).body(new AuthResponse(Code.A3));
         }
     }
 

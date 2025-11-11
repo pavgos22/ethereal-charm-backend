@@ -51,6 +51,8 @@ public class User implements UserDetails {
     private String companyName;
     @Column(name = "nip")
     private String nip;
+    @Column(name = "two_factor_enabled", nullable = false)
+    private boolean twoFactorEnabled = false;
     @ElementCollection
     @CollectionTable(
             name = "user_favourites",

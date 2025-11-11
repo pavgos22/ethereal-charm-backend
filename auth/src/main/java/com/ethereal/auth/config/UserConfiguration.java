@@ -31,7 +31,7 @@ public class UserConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf().disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/api/v1/auth/register", "/api/v1/auth/login", "/api/v1/auth/validate", "/api/v1/auth/reset-password", "/api/v1/auth/activate", "/api/v1/auth/deactivate", "/api/v1/auth/logout", "/api/v1/auth/auto-login", "/api/v1/auth/logged-in", "/api/v1/auth/authorize", "/api/v1/user/shipping-details", "/api/v1/user/profile", "/api/v1/user/favourites", "/api/v1/public/check-email").permitAll()
+                .requestMatchers("/api/v1/auth/register", "/api/v1/auth/login", "/api/v1/auth/validate", "/api/v1/auth/reset-password", "/api/v1/auth/activate", "/api/v1/auth/deactivate", "/api/v1/auth/logout", "/api/v1/auth/auto-login", "/api/v1/auth/logged-in", "/api/v1/auth/authorize", "/api/v1/auth/2fa/verify", "/api/v1/auth/settings/2fa", "/api/v1/user/shipping-details", "/api/v1/user/profile", "/api/v1/user/favourites", "/api/v1/public/check-email").permitAll()
                 .and()
                 .build();
     }

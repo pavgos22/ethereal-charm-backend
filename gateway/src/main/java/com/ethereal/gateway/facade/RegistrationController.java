@@ -1,4 +1,4 @@
-package com.ethereal.gateway.fasada;
+package com.ethereal.gateway.facade;
 
 import com.ethereal.gateway.entity.Endpoint;
 import com.ethereal.gateway.filter.RouteValidator;

@@ -1,4 +1,8 @@
 FROM maven:3.9.6-eclipse-temurin-17-alpine AS build
+
+ARG GH_PACKAGES_TOKEN
+ENV GH_PACKAGES_TOKEN=${GH_PACKAGES_TOKEN}
+
 WORKDIR /app
 COPY settings.xml /root/.m2/settings.xml
 COPY pom.xml .

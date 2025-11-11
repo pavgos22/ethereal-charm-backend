@@ -79,6 +79,22 @@ public class EmailService {
         log.info("--STOP sendPasswordRecovery");
     }
 
+    public void sendTwoFactorCode(String email, String code) {
+        String html = """
+        <div style="font-family:Arial,sans-serif">
+          <p>Twój kod logowania 2FA:</p>
+          <p style="font-size:24px;font-weight:bold;letter-spacing:3px">%s</p>
+          <p>Kod wygasa za 5 minut.</p>
+        </div>
+        """.formatted(code);
+        try {
+            emailConfiguration.sendMail(email, html, "Kod weryfikacyjny (2FA)", true);
+        } catch (Exception e) {
+            log.error("Błąd wysyłania 2FA", e);
+            throw new RuntimeException(e);
+        }
+    }
+
     private static String readTemplate(Resource resource) throws IOException {
         try (InputStream in = resource.getInputStream()) {
             return new String(in.readAllBytes(), StandardCharsets.UTF_8);
