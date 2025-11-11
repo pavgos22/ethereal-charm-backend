@@ -81,16 +81,60 @@ public class EmailService {
 
     public void sendTwoFactorCode(String email, String code) {
         String html = """
-        <div style="font-family:Arial,sans-serif">
-          <p>Twój kod logowania 2FA:</p>
-          <p style="font-size:24px;font-weight:bold;letter-spacing:3px">%s</p>
-          <p>Kod wygasa za 5 minut.</p>
-        </div>
+        <!DOCTYPE html>
+        <html lang="pl">
+        <head>
+          <meta charset="UTF-8">
+          <style>
+            body {
+              font-family: 'Segoe UI', Roboto, sans-serif;
+              background-color: #f7f7f7;
+              margin: 0;
+              padding: 40px 0;
+            }
+            .container {
+              background-color: #ffffff;
+              max-width: 600px;
+              margin: auto;
+              border-radius: 12px;
+              box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+              padding: 30px 40px;
+              text-align: center;
+            }
+            h2 {
+              color: #333;
+              margin-bottom: 10px;
+            }
+            .code {
+              font-size: 32px;
+              font-weight: bold;
+              letter-spacing: 4px;
+              color: #222;
+              margin: 25px 0;
+            }
+            p {
+              color: #555;
+              font-size: 15px;
+              line-height: 1.5;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <h2>Twój kod potwierdzenia logowania</h2>
+            <p>Aby dokończyć logowanie do swojego konta <strong>Ethereal Charm</strong>, wpisz poniższy kod:</p>
+            <div class="code">%s</div>
+            <p>Kod jest ważny przez <strong>5 minut</strong>.</p>
+            <p>Jeśli to nie Ty próbowałeś(-aś) się zalogować, zignoruj tę wiadomość.</p>
+          </div>
+        </body>
+        </html>
         """.formatted(code);
+
         try {
-            emailConfiguration.sendMail(email, html, "Kod weryfikacyjny (2FA)", true);
+            emailConfiguration.sendMail(email, html, "Twój kod potwierdzenia logowania – Ethereal Charm", true);
         } catch (Exception e) {
-            log.error("Błąd wysyłania 2FA", e);
+            log.error("Błąd wysyłania kodu potwierdzenia logowania", e);
             throw new RuntimeException(e);
         }
     }
