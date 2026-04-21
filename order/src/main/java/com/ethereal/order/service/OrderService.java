@@ -86,11 +86,12 @@ public class OrderService {
                 orderItems.setOrder(finalOrder);
                 orderItems.setUuid(UUID.randomUUID().toString());
                 items.add(itemService.save(orderItems));
-                cartService.removeCart(value, item.getUuid());
                 System.out.println("OrderItems: " + orderItems);
             });
 
             result.set(payuService.createOrder(finalOrder, items));
+
+            cart.getCartProducts().forEach(item -> cartService.removeCart(value, item.getUuid()));
             value.setMaxAge(0);
             response.addCookie(value);
             emailService.sendActivation(order.getEmail(), order, items);

@@ -89,6 +89,7 @@ public class ProductMediator {
             productService.delete(uuid);
             return ResponseEntity.ok(new Response("Successful delete product"));
         } catch (RuntimeException e) {
+            e.printStackTrace();
             return ResponseEntity.status(400).body(new Response("Product doesn't exist"));
         }
     }

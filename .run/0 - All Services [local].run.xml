@@ -1,0 +1,12 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="0 - All Services [local]" type="CompoundRunConfigurationType">
+    <toRun name="1 - Eureka [local]" type="SpringBootApplicationConfigurationType" />
+    <toRun name="2 - Gateway [local]" type="SpringBootApplicationConfigurationType" />
+    <toRun name="3 - Auth [local]" type="SpringBootApplicationConfigurationType" />
+    <toRun name="4 - Product [local]" type="SpringBootApplicationConfigurationType" />
+    <toRun name="5 - Cart [local]" type="SpringBootApplicationConfigurationType" />
+    <toRun name="6 - Order [local]" type="SpringBootApplicationConfigurationType" />
+    <toRun name="7 - File [local]" type="SpringBootApplicationConfigurationType" />
+    <method v="2" />
+  </configuration>
+</component>

@@ -58,6 +58,10 @@ public class PayuService {
 
 
     public String createOrder(Order finalOrder, List<OrderItems> items) throws HttpClientErrorException {
+        if ("dev".equalsIgnoreCase(client_id) || client_id == null || client_id.isBlank()) {
+            System.out.println("[PayuService] LOCAL BYPASS — PayU placeholder credentials, zwracam stub redirect URL");
+            return "http://localhost:4200/payment-success?extOrderId=" + finalOrder.getOrders();
+        }
         try {
             return (String) sendOrder(finalOrder, items).getBody();
         } catch (HttpClientErrorException e) {

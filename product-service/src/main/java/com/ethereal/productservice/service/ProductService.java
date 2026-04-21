@@ -191,10 +191,12 @@ public class ProductService {
         productRepository.findByUid(uuid).ifPresentOrElse(value -> {
             value.setActivate(false);
             productRepository.save(value);
-            for (String image : value.getImageUrls()) {
-                deleteImages(image);
+            String[] images = value.getImageUrls();
+            if (images != null) {
+                for (String image : images) {
+                    deleteImages(image);
+                }
             }
-
         }, () -> {
             throw new RuntimeException();
         });

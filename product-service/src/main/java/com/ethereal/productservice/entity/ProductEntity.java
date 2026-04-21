@@ -1,5 +1,6 @@
 package com.ethereal.productservice.entity;
 
+import com.vladmihalcea.hibernate.type.array.StringArrayType;
 import com.vladmihalcea.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -33,20 +34,21 @@ public class ProductEntity extends Product {
     private String uid;
     @Column(name = "activate")
     private boolean activate;
-    @Column(name = "main_desc")
+    @Column(name = "main_desc", columnDefinition = "TEXT")
     private String mainDesc;
-    @Column(name = "desc_html")
+    @Column(name = "desc_html", columnDefinition = "TEXT")
     private String descHtml;
-    @Column(name = "price")
+    @Column(name = "price", columnDefinition = "numeric(10,2)")
     private float price;
-    @Column(name = "image_urls")
+    @Type(StringArrayType.class)
+    @Column(name = "image_urls", columnDefinition = "text[]")
     private String[] imageUrls;
     @Type(JsonType.class)
     @Column(columnDefinition = "jsonb")
     private Map<String, String> parameters;
     @Column(name = "discount")
     private boolean discount;
-    @Column(name = "discounted_price")
+    @Column(name = "discounted_price", columnDefinition = "numeric(10,2)")
     private Float discountedPrice;
     @Column(name = "priority")
     private Integer priority = 50;
